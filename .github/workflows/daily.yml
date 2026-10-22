@@ -1,0 +1,22 @@
+name: Daily sleep screen
+on:
+  schedule:
+    - cron: "33 0 * * *"      # 05:33 по Астане (UTC+5)
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get install -y fonts-dejavu-core
+      - run: pip install pillow
+      - run: python generate.py
+      - name: Commit screen
+        run: |
+          git config user.name "noxen-bot"
+          git config user.email "noxen-bot@users.noreply.github.com"
+          git add screen.bmp preview.png state.json
+          git diff --cached --quiet || git commit -m "screen $(date -u +%F)"
+          git push
